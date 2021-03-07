@@ -22,8 +22,6 @@ module.exports = function sqlScriptRunner(object,initialNumber,sqlScriptTemplate
                     'number': num
                 }
             })
-
-    console.log(resultMapped)
             
 
 

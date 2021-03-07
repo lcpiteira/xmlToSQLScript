@@ -1,8 +1,6 @@
 'use strict'
 
 module.exports = function sqlScriptBuilder(obj, parent, sqlScriptTemplate) {
-
-    console.log(obj)
  
     const result = {
         res : {},
@@ -26,7 +24,7 @@ module.exports = function sqlScriptBuilder(obj, parent, sqlScriptTemplate) {
 
                 }
                 if (value && typeof value === 'object' ) {
-                    console.log('key ', key)
+                    
                     var keyList = Object.keys(obj[key])
 
                     if(Number.isInteger(parseInt(key))){
