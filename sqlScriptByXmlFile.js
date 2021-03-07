@@ -1,19 +1,22 @@
 'use strict'
 
-
+var fs = require('fs')
 var xmlToJson = require('./util/xmlTojson')
-var sqlScriptBuilder = require('./util/sqlScriptBuilder')
+var sqlScriptRunner = require('./util/sqlScriptRunner')
 var sqlScriptTemplate = require('./sqlScriptTemplate')()
 
+var filename = 'e'
 
-xmlToJson('e.XML')
+xmlToJson(`${filename}.XML`)
     .then((result) => {
 
         var object = result.document.placeholders
         
-        sqlScriptBuilder(object,63,sqlScriptTemplate)
+        var script = sqlScriptRunner(object,63,sqlScriptTemplate)
 
-        sqlScriptTemplate.setEndOfScript()   
+        fs.writeFile(`./sql/${filename}.SQL`, script, (err)=>{
+            if (err) return console.log(err);
+        })
 
     }).catch((err) => {
         console.log(err);
