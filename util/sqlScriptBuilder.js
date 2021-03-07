@@ -2,54 +2,88 @@
 
 module.exports = function sqlScriptBuilder(obj, parent, sqlScriptTemplate) {
 
-    /**
-     * HEADER OF SCRIPT
-     */
-
-    var objectLength = getLengthOfNestedObject(obj).length
-    console.log(sqlScriptTemplate.createHeader(parent, objectLength));
-     
-    
-
-    /**
-     * SYSTEM CONFIGURATION
-     */
-    sqlScriptTemplate.systemConfiguration('BDOC','SYS.00001')
-
-
-    const res = {};
+    console.log(obj)
+ 
+    const result = {
+        res : {},
+        array : []
+    }
     var sqlScriptTemplate = sqlScriptTemplate
     function recurse(obj, current) {
+
         for (const key in obj) {
             let value = obj[key];
             if(value != undefined) {
-                if (value && typeof value === 'object') {
+                if(value && Array.isArray(value)){
+
+                    let arr = result.array
+                    arr.push({
+                        'key': key,
+                        'type': 'Object'
+                    })
+                    result.array = arr
+                    //colocar List 
+
+                }
+                if (value && typeof value === 'object' ) {
+                    console.log('key ', key)
+                    var keyList = Object.keys(obj[key])
+
+                    if(Number.isInteger(parseInt(key))){
+                        
+                        //do nothing
+                    }
+                    else if (Array.isArray(obj[key][keyList])){
+                        var newObj = {
+                            'key': key,
+                            'type': 'List'
+                        }
+                        
+                        var keyNames = result.array.map(obj => obj.key)
+
+                        if(!keyNames.includes(key)){
+                            result.array.push(newObj)
+                        }
+                    }
+                    else{
+                        var newObj = {
+                            'key': key,
+                            'type': 'Object'
+                        }
+                        
+                        var keyNames = result.array.map(obj => obj.key)
+
+                        if(!keyNames.includes(key)){
+                            result.array.push(newObj)
+                        }
+                    }
 
                     var number = parent++
-                    sqlScriptTemplate.createObject(key,number)
-                    sqlScriptTemplate.createMappings(number,key)
                     
-                    
-                    res[key] = value;
+                    result.res[key] = value;
                     recurse(value, key, parent++);
                 } else {
 
                     let child = parent++
 
-                    sqlScriptTemplate.createString(key,child)
-                    sqlScriptTemplate.createMappings(child,key)
-                    
+                    var newObj = {
+                        'key': key,
+                        'type': 'String'
+                    }
 
-                    res[key] = value;
+                    var keyNames = result.array.map(obj => obj.key)
+
+                    if(!keyNames.includes(key)){
+                        result.array.push(newObj)
+                    }
+
+                    result.res[key] = value;
                 }
             }
         }
     }
     recurse(obj, parent);
-    return res;
-
-
-     
+    return result;
 }
 
 
